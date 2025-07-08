@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  django:
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile-local
+    container_name: abk_back
+    ports:
+        - "8001:8000"
+    environment:
+      - SECRET_KEY=5(15ds+i2+%ik6z&!yer+ga9m=e%jcqiz_5wszg)r-z!2--b2d
+      - DEBUG=True
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=123456
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DJANGO_SUPERUSER_NAME=admin
+      - DJANGO_SUPERUSER_MAIL=oo@mail.com
+      - DJANGO_SUPERUSER_PASSWORD=1234
+    volumes:
+      - ./abk_back:/var/www/abk_back
+      #- ./abk_back/mysite:/var/www/abk_back/mysite
+      # - ./django/mysite/static:/var/www/django/mysite/static
+    #working_dir: /var/www/abk_back/mysite
+    working_dir: /var/www/abk_back
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - postgres
+
+  postgres:
+    restart: always
+    container_name: abk_db
+    build: ./postgres/
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=123456
+    volumes:
+      - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - /var/lib/postgresql

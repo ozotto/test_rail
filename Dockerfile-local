@@ -1,0 +1,25 @@
+FROM python:3.11
+
+# Update et installation de dépendances
+RUN apt-get update
+
+# Copier et configurer le script d'entrée
+COPY entrypoint.sh /var/www/abk_back/entrypoint.sh
+RUN chmod +x /var/www/abk_back/entrypoint.sh
+
+# Copier les dépendances
+COPY requirements.txt /var/www/abk_back/
+WORKDIR /var/www/abk_back
+RUN pip install -r requirements.txt
+
+# Copier toute l'application Django
+COPY abk_back /var/www/abk_back/
+
+# Créer le dossier static
+RUN mkdir -p /var/www/abk_back/static/admin
+
+# Définir le répertoire de travail correct
+WORKDIR /var/www/abk_back
+
+# Lancer le script
+ENTRYPOINT ["/var/www/abk_back/entrypoint.sh"]

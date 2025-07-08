@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import dj_database_url
 import os
 from pathlib import Path
 
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
@@ -78,9 +80,16 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# Set default values for the environment variables if they’re not already set
+os.environ.setdefault("PGDATABASE", "db_test_rail")
+os.environ.setdefault("PGUSER", "us_test_rail")
+os.environ.setdefault("PGPASSWORD", "123456")
+os.environ.setdefault("PGHOST", "localhost")
+os.environ.setdefault("PGPORT", "5432")
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ["PGDATABASE"],
         'USER': os.environ["PGUSER"],
         'PASSWORD': os.environ["PGPASSWORD"],
@@ -88,6 +97,16 @@ DATABASES = {
         'PORT': os.environ["PGPORT"],
     }
 }
+
+# Si DATABASE_URL est défini (ex: en local ou sur une autre plateforme), on l'utilise
+DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL', None)) or DATABASES['default']
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='postgres://postgres:dfHwwEOuRhmHIlIfpnrDFAXpbJxyeHrR@yamanote.proxy.rlwy.net:21335/railway',
+#         engine='django.db.backends.postgresql'
+#     )
+# }
 
 
 # Password validation
